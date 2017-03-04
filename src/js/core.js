@@ -4,6 +4,7 @@ var ENEMY_HEIGHT = 70;
 
 var block;
 var enemies = [];
+var score;
 
 function startGame() {
     cx = 480;
@@ -11,13 +12,12 @@ function startGame() {
 //    cx = document.body.canvas.clientWidth;
 //    cy = document.body.canvas.clientHeight;
     block = new component(30, 30, "red", 10, 120);
-    ex = gameArea.canvas.width;
-    ey = gameArea.canvas.height - ENEMY_HEIGHT;
-//    enemies.push(new component(30, ENEMY_HEIGHT, "green", ex, ey));
+    score = new component("30px", "Consolas",  "black", 280, 40, "text");
     gameArea.start(cx, cy);
 }
 
-function component(width, height, color, x, y) {
+function component(width, height, color, x, y, type) {
+    this.type = type
     this.width = width;
     this.height = height;
     this.speedX = 0;
@@ -25,9 +25,15 @@ function component(width, height, color, x, y) {
     this.x = x;
     this.y = y;
     this.update = function(){
-        ctx = gameArea.context
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx = gameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
     }
     this.newPos = function() {
         this.x += this.speedX;
@@ -111,6 +117,8 @@ function updateGameArea() {
         enemies[i].x -= SPEED_ENEMY;
         enemies[i].update();
     }
+    score.text = "SCORE: " + Math.trunc(gameArea.frameNo/2);
+    score.update();
     block.newPos();
     block.update();
 }
