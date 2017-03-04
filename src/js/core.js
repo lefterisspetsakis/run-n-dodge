@@ -101,6 +101,7 @@ function updateGameArea() {
     }
     gameArea.clear();
     gameArea.frameNo += 1;
+    
     block.speedX = 0;
     block.speedY = 0;
     if (gameArea.keys && gameArea.keys[37]) {block.speedX = -SPEED; }
@@ -117,6 +118,12 @@ function updateGameArea() {
         enemies[i].x -= SPEED_ENEMY;
         enemies[i].update();
     }
+    
+    if (enemies[0].x < -enemies[0].width) {
+        enemies.shift();
+    }
+    console.log(enemies.length);
+    
     score.text = "SCORE: " + Math.trunc(gameArea.frameNo/2);
     score.update();
     block.newPos();
