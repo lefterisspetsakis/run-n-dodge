@@ -1,6 +1,10 @@
-var SPEED = 2;          // speed of player
-var SPEED_ENEMY = 1;
-var ENEMY_HEIGHT = 70;
+var SPEED = 0;          // speed of player
+var SPEED_ENEMY = 5;
+
+var ACCEL_GRAVITY = 0.8;
+var SPEED_IMPULSE = 12;
+
+var ENEMY_HEIGHT = 30;
 
 var block;          // block object (player)
 var enemies = [];   // list of enemy objects
@@ -22,12 +26,17 @@ function component(width, height, color, x, y, type) {
     this.width = width;
     this.height = height;
     
-    this.speedX = 0;
-    this.speedY = 0;
-    
     // current position
     this.x = x;
     this.y = y;
+    
+    // current speed
+    this.speedX = 0;
+    this.speedY = 0;
+    
+    // current acceleration
+    this.gravity = ACCEL_GRAVITY;
+    this.gravity_speed = 0;
     
     // handles color, size
     this.update = function(){
@@ -44,8 +53,26 @@ function component(width, height, color, x, y, type) {
     
     // handles position
     this.newPos = function() {
+        this.gravity_speed += this.gravity;
         this.x += this.speedX;
-        this.y += this.speedY;
+        this.y += this.speedY + this.gravity_speed;
+        this.hitBottom();
+    }
+    
+    this.impulseUp = function() {
+        this.gravity_speed = -(SPEED_IMPULSE);
+    }
+    
+    this.hitBottom = function() {
+        var rockbottom = gameArea.canvas.height - this.height;
+        console.log("ROCKBOTTOM: ", rockbottom);
+        if (this.y >= rockbottom) {
+            this.y = rockbottom;
+            this.speedY = 0;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     // handles component collision
@@ -116,8 +143,10 @@ function updateGameArea() {
     }
     
     // if enemy leaves the screen, remove it from list
-    if (enemies[0].x < -enemies[0].width) {
-        enemies.shift();
+    if (enemies.length > 0) {
+        if (enemies[0].x < -enemies[0].width) {
+            enemies.shift();
+        }
     }
     console.log(enemies.length);
     
@@ -128,12 +157,25 @@ function updateGameArea() {
     // key inputs
     if (gameArea.keys && gameArea.keys[37]) {block.speedX = -SPEED; }
     if (gameArea.keys && gameArea.keys[39]) {block.speedX = SPEED; }
-    if (gameArea.keys && gameArea.keys[38]) {block.speedY = -SPEED; }
-    if (gameArea.keys && gameArea.keys[40]) {block.speedY = SPEED; }
+    if (gameArea.keys && gameArea.keys[40]) {
+        console.log("DOWN BUTTON PRESSED")
+    }
+    if (gameArea.keys && gameArea.keys[38]) {
+        if (block.hitBottom()) {
+            block.impulseUp();
+            console.log(block.speedY);
+
+        }
+    }
     
     // update block
     block.newPos();
     block.update();
+    console.log("--------------------------------");
+    console.log(block.hitBottom());
+    console.log(block.y);
+    console.log(block.gravity_speed);
+    console.log("--------------------------------");
 }
 
 // main canvas
