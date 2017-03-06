@@ -1,8 +1,8 @@
 var SPEED = 0;          // speed of player
 var SPEED_ENEMY = 5;
 
-var ACCEL_GRAVITY = 0.8;
-var SPEED_IMPULSE = 12;
+var ACCEL_GRAVITY = 0.7;
+var SPEED_IMPULSE = 13;
 
 var ENEMY_HEIGHT = 30;
 
@@ -109,6 +109,10 @@ function everyInterval(n) {
     return false;
 }
 
+function getRandInterval(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 // main update function
 function updateGameArea() {
     
@@ -130,7 +134,12 @@ function updateGameArea() {
     block.speedY = 0;
     
     // spawn new block
-    if (gameArea.frameNo == 1 || everyInterval(150)) {
+    
+    var randomNum = getRandInterval(30, 150);
+    
+    console.log("Random Interval", randomNum);
+    
+    if (gameArea.frameNo == 1 || everyInterval(randomNum)) {
         x = gameArea.canvas.width;
         y = gameArea.canvas.height - ENEMY_HEIGHT;
         enemies.push(new component(30, ENEMY_HEIGHT, "green", x, y))
@@ -158,7 +167,7 @@ function updateGameArea() {
     if (gameArea.keys && gameArea.keys[37]) {block.speedX = -SPEED; }
     if (gameArea.keys && gameArea.keys[39]) {block.speedX = SPEED; }
     if (gameArea.keys && gameArea.keys[40]) {
-        console.log("DOWN BUTTON PRESSED")
+        console.log("DOWN BUTTON PRESSED");
     }
     if (gameArea.keys && gameArea.keys[38]) {
         if (block.hitBottom()) {
